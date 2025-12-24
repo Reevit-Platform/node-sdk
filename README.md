@@ -1,4 +1,4 @@
-# Reevit TypeScript SDK
+# Reevit TypeScript SD
 
 The official Node.js/TypeScript SDK for [Reevit](https://reevit.io) — a unified payment orchestration platform for Africa.
 
