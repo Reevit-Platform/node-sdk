@@ -3,6 +3,7 @@ export interface PaymentIntentRequest {
   currency: string;
   method: string;
   country: string;
+  reference?: string;
   customer_id?: string;
   policy?: FraudPolicyInput;
   metadata?: Record<string, any>;
@@ -21,6 +22,7 @@ export interface Payment {
   connection_id: string;
   provider: string;
   provider_ref_id: string;
+  reference?: string;
   method: string;
   status: string;
   amount: number;
@@ -39,6 +41,7 @@ export interface PaymentSummary {
   id: string;
   connection_id: string;
   provider: string;
+  reference?: string;
   method: string;
   status: string;
   amount: number;
