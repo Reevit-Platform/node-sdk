@@ -35,7 +35,16 @@ export interface Payment {
   route: PaymentRouteAttempt[];
   created_at: string;
   updated_at: string;
+  /** Payment source type (payment_link, api, subscription) */
+  source?: PaymentSource;
+  /** ID of the source (payment link ID, subscription ID, etc.) */
+  source_id?: string;
+  /** Human-readable description of the source (e.g., payment link name) */
+  source_description?: string;
 }
+
+/** Payment source type - indicates where the payment originated from */
+export type PaymentSource = 'payment_link' | 'api' | 'subscription';
 
 export interface PaymentSummary {
   id: string;
@@ -52,6 +61,12 @@ export interface PaymentSummary {
   customer_id: string;
   metadata: Record<string, any>;
   created_at: string;
+  /** Payment source type (payment_link, api, subscription) */
+  source?: PaymentSource;
+  /** ID of the source (payment link ID, subscription ID, etc.) */
+  source_id?: string;
+  /** Human-readable description of the source (e.g., payment link name) */
+  source_description?: string;
 }
 
 export interface PaymentRouteAttempt {
