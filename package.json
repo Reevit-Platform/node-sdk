@@ -1,6 +1,6 @@
 {
   "name": "@reevit/node",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Reevit Node.js SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
