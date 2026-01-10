@@ -19,13 +19,14 @@ interface ReevitCheckoutConfig {
 interface CreatePaymentIntentRequest {
   amount: number;
   currency: string;
-  method: string;
+  method?: string;
   country: string;
   customer_id?: string;
   metadata?: Record<string, unknown>;
   description?: string;
   policy?: {
     prefer?: string[];
+    allowed_providers?: string[];
     max_amount?: number;
     blocked_bins?: string[];
     allowed_bins?: string[];
@@ -46,6 +47,13 @@ interface PaymentIntentResponse {
   fee_currency: string;
   net_amount: number;
   reference?: string;
+  available_psps?: Array<{
+    provider: string;
+    name: string;
+    methods: string[];
+    countries?: string[];
+  }>;
+  branding?: Record<string, unknown>;
 }
 
 interface ConfirmPaymentRequest {
@@ -161,15 +169,28 @@ export class ReevitAPIClient {
     }
   }
 
-  async createPaymentIntent(config: ReevitCheckoutConfig, method: PaymentMethod, country = 'GH'): Promise<{ data?: PaymentIntentResponse; error?: PaymentError }> {
+  async createPaymentIntent(
+    config: ReevitCheckoutConfig,
+    method?: PaymentMethod,
+    country = 'GH',
+    options?: { preferredProviders?: string[]; allowedProviders?: string[] }
+  ): Promise<{ data?: PaymentIntentResponse; error?: PaymentError }> {
     const request: CreatePaymentIntentRequest = {
       amount: config.amount,
       currency: config.currency,
-      method: this.mapPaymentMethod(method),
       country,
       customer_id: config.metadata?.customerId as string | undefined,
       metadata: config.metadata,
     };
+    if (method) {
+      request.method = this.mapPaymentMethod(method);
+    }
+    if (options?.preferredProviders?.length || options?.allowedProviders?.length) {
+      request.policy = {
+        prefer: options.preferredProviders,
+        allowed_providers: options.allowedProviders,
+      };
+    }
     return this.request<PaymentIntentResponse>('POST', '/v1/payments/intents', request);
   }
 

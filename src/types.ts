@@ -11,6 +11,7 @@ export interface PaymentIntentRequest {
 
 export interface FraudPolicyInput {
   prefer?: string[];
+  allowed_providers?: string[];
   max_amount?: number;
   blocked_bins?: string[];
   allowed_bins?: string[];
