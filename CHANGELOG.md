@@ -2,6 +2,21 @@
 
 All notable changes to `@reevit/typescript` will be documented in this file.
 
+## [0.5.0] - 2026-01-11
+
+### 🚀 New Features
+
+#### Added: Apple Pay & Google Pay Support
+Updated `PaymentMethod` types and documentation to include `apple_pay` and `google_pay` as first-class payment methods.
+
+### 📦 Install / Upgrade
+
+```bash
+npm install @reevit/node@0.5.0
+```
+
+---
+
 ## [0.3.2] - 2025-12-29
 
 ### 🚀 New Features

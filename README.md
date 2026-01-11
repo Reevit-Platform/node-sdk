@@ -36,7 +36,7 @@ The official Node.js/TypeScript SDK for [Reevit](https://reevit.io) — a unifie
 ## Installation
 
 ```bash
-npm install @reevit/node
+npm install @reevit/node@0.5.0
 ```
 
 Or using yarn:
@@ -138,9 +138,9 @@ const payment = await reevit.payments.createIntent({
 
 | Country | Code | Supported Methods |
 |---------|------|-------------------|
-| Ghana | `GH` | `momo`, `card`, `bank_transfer` |
-| Nigeria | `NG` | `card`, `bank_transfer`, `ussd` |
-| Kenya | `KE` | `mpesa`, `card` |
+| Ghana | `GH` | `momo`, `card`, `bank_transfer`, `apple_pay`, `google_pay` |
+| Nigeria | `NG` | `card`, `bank_transfer`, `ussd`, `apple_pay`, `google_pay` |
+| Kenya | `KE` | `mpesa`, `card`, `apple_pay`, `google_pay` |
 
 #### Full Example with All Options
 
@@ -642,7 +642,7 @@ Reevit currently supports the following payment service providers:
 | **Hubtel** | Ghana | Mobile Money | Webhooks |
 | **M-Pesa** | Kenya | M-Pesa (STK Push) | Reversals, Webhooks |
 | **Monnify** | Nigeria | Bank Transfer, Card | Refunds, Webhooks |
-| **Stripe** | Global | Card (incl. Apple Pay/Google Pay via card rails) | Refunds, Webhooks |
+| **Stripe** | Global | Card, Apple Pay, Google Pay | Refunds, Webhooks |
 
 > Stripe webhooks: configure the Reevit webhook URL in Stripe; store the signing secret in the connection credentials (`stripe_webhook_secret`, `webhook_secret`, or `signing_secret`). Ensure PaymentIntent metadata includes `org_id`, `connection_id`, and `payment_id` so events map correctly.
 
