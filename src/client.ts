@@ -14,6 +14,7 @@ interface ReevitCheckoutConfig {
   amount: number;
   currency: string;
   metadata?: Record<string, unknown>;
+  idempotencyKey?: string;
 }
 
 interface CreatePaymentIntentRequest {
@@ -124,7 +125,12 @@ export class ReevitAPIClient {
     this.timeout = config.timeout || DEFAULT_TIMEOUT;
   }
 
-  private async request<T>(method: string, path: string, body?: any): Promise<{ data?: T; error?: PaymentError }> {
+  private async request<T>(
+    method: string,
+    path: string,
+    body?: any,
+    idempotencyKey?: string
+  ): Promise<{ data?: T; error?: PaymentError }> {
     try {
       const response = await axios({
         method,
@@ -135,6 +141,7 @@ export class ReevitAPIClient {
           'Authorization': `Bearer ${this.publicKey}`,
           'X-Reevit-Client': '@reevit/node',
           'X-Reevit-Client-Version': '0.3.0',
+          ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
         },
         timeout: this.timeout,
       });
@@ -191,7 +198,7 @@ export class ReevitAPIClient {
         allowed_providers: options.allowedProviders,
       };
     }
-    return this.request<PaymentIntentResponse>('POST', '/v1/payments/intents', request);
+    return this.request<PaymentIntentResponse>('POST', '/v1/payments/intents', request, config.idempotencyKey);
   }
 
   async getPaymentIntent(paymentId: string): Promise<{ data?: PaymentDetailResponse; error?: PaymentError }> {

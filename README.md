@@ -70,7 +70,8 @@ const payment = await reevit.payments.createIntent({
   currency: 'GHS',
   method: 'momo',
   country: 'GH',
-  customer_id: 'cust_123'
+  customer_id: 'cust_123',
+  idempotencyKey: 'order_12345'
 });
 
 console.log('Payment ID:', payment.id);
@@ -127,6 +128,7 @@ const payment = await reevit.payments.createIntent({
   method: 'momo',          // Payment method
   country: 'GH',           // ISO country code
   customer_id: 'cust_123', // Optional: Your customer reference
+  idempotencyKey: 'order_456', // Optional: Safe retries / dedupe
   metadata: {              // Optional: Custom metadata
     order_id: 'order_456',
     product: 'Premium Plan'
