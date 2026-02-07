@@ -36,7 +36,7 @@ The official Node.js/TypeScript SDK for [Reevit](https://reevit.io) — a unifie
 ## Installation
 
 ```bash
-npm install @reevit/node@0.5.0
+npm install @reevit/node@0.7.0
 ```
 
 Or using yarn:
@@ -1372,6 +1372,15 @@ REEVIT_API_KEY=pfk_live_xxx
 REEVIT_ORG_ID=org_xxx
 REEVIT_WEBHOOK_SECRET=whsec_xxx  # Get from Dashboard > Developers > Webhooks
 ```
+
+---
+
+## Release Notes
+
+### v0.7.0
+
+- Version alignment across all Reevit SDKs
+- Updated documentation and webhook examples
 
 ---
 
