@@ -39,6 +39,7 @@ interface PaymentIntentResponse {
   id: string;
   connection_id: string;
   provider: string;
+  provider_ref_id?: string;
   status: string;
   client_secret: string;
   psp_public_key?: string;
