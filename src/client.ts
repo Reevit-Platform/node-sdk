@@ -39,6 +39,7 @@ interface PaymentIntentResponse {
   id: string;
   connection_id: string;
   provider: string;
+  provider_ref_id?: string;
   status: string;
   client_secret: string;
   psp_public_key?: string;
@@ -96,11 +97,10 @@ interface ReevitAPIClientConfig {
 // Constants
 
 const API_BASE_URL_PRODUCTION = 'https://api.reevit.io';
-const API_BASE_URL_SANDBOX = 'https://sandbox-api.reevit.io';
 const DEFAULT_TIMEOUT = 30000;
 
 function isSandboxKey(publicKey: string): boolean {
-  return publicKey.startsWith('pk_test_') || publicKey.startsWith('pk_sandbox_');
+  return publicKey.startsWith('pfk_test_');
 }
 
 function createPaymentError(response: any, errorData: APIErrorResponse): PaymentError {
@@ -121,7 +121,7 @@ export class ReevitAPIClient {
 
   constructor(config: ReevitAPIClientConfig) {
     this.publicKey = config.publicKey;
-    this.baseUrl = config.baseUrl || (isSandboxKey(config.publicKey) ? API_BASE_URL_SANDBOX : API_BASE_URL_PRODUCTION);
+    this.baseUrl = config.baseUrl || API_BASE_URL_PRODUCTION;
     this.timeout = config.timeout || DEFAULT_TIMEOUT;
   }
 
@@ -138,9 +138,9 @@ export class ReevitAPIClient {
         data: body,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.publicKey}`,
+          'X-Reevit-Key': this.publicKey,
           'X-Reevit-Client': '@reevit/node',
-          'X-Reevit-Client-Version': '0.3.0',
+          'X-Reevit-Client-Version': '0.8.1',
           ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
         },
         timeout: this.timeout,
@@ -210,7 +210,10 @@ export class ReevitAPIClient {
   }
 
   async confirmPaymentIntent(paymentId: string, clientSecret: string): Promise<{ data?: PaymentDetailResponse; error?: PaymentError }> {
-    return this.request<PaymentDetailResponse>('POST', `/v1/payments/${paymentId}/confirm-intent?client_secret=${clientSecret}`);
+    return this.request<PaymentDetailResponse>(
+      'POST',
+      `/v1/payments/${paymentId}/confirm-intent?client_secret=${encodeURIComponent(clientSecret)}`
+    );
   }
 
   async cancelPaymentIntent(paymentId: string): Promise<{ data?: PaymentDetailResponse; error?: PaymentError }> {
