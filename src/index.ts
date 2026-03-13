@@ -3,16 +3,21 @@ import { PaymentsService } from './services/payments';
 import { ConnectionsService } from './services/connections';
 import { SubscriptionsService } from './services/subscriptions';
 import { FraudService } from './services/fraud';
+import { CustomersService } from './services/customers';
+import { PaymentLinksService } from './services/payment-links';
+import { WebhooksService } from './services/webhooks';
+import { RoutingRulesService } from './services/routing-rules';
+import { InvoicesService } from './services/invoices';
+import { ReevitClientOptions } from './types';
 
 // Default API base URLs (secure HTTPS)
 const API_BASE_URL_PRODUCTION = 'https://api.reevit.io';
-const API_BASE_URL_SANDBOX = 'https://sandbox-api.reevit.io';
 
 /**
  * Determines if an API key is for sandbox mode
  */
 function isSandboxKey(apiKey: string): boolean {
-  return apiKey.startsWith('sk_test_') || apiKey.startsWith('sk_sandbox_');
+  return apiKey.startsWith('pfk_test_');
 }
 
 export class Reevit {
@@ -22,17 +27,33 @@ export class Reevit {
   public connections: ConnectionsService;
   public subscriptions: SubscriptionsService;
   public fraud: FraudService;
+  public customers: CustomersService;
+  public paymentLinks: PaymentLinksService;
+  public webhooks: WebhooksService;
+  public routingRules: RoutingRulesService;
+  public invoices: InvoicesService;
 
-  constructor(apiKey: string, orgId: string, baseUrl?: string) {
-    // Use provided baseUrl, or auto-detect based on API key prefix
-    const resolvedBaseUrl = baseUrl || (isSandboxKey(apiKey) ? API_BASE_URL_SANDBOX : API_BASE_URL_PRODUCTION);
+  constructor(
+    apiKey: string,
+    orgId: string,
+    baseUrlOrOptions?: string | ReevitClientOptions,
+    maybeOptions?: ReevitClientOptions,
+  ) {
+    const options =
+      typeof baseUrlOrOptions === 'string'
+        ? { ...(maybeOptions || {}), baseUrl: baseUrlOrOptions }
+        : (baseUrlOrOptions || {});
+
+    const resolvedBaseUrl = options.baseUrl || API_BASE_URL_PRODUCTION;
 
     this.client = axios.create({
       baseURL: resolvedBaseUrl,
-      timeout: 10000,
+      timeout: options.timeout || 10000,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'reevit-node/0.1.0',
+        'User-Agent': 'reevit-node/0.8.0',
+        'X-Reevit-Client': '@reevit/node',
+        'X-Reevit-Client-Version': '0.8.1',
         'X-Reevit-Key': apiKey,
         'X-Org-Id': orgId,
       },
@@ -42,6 +63,11 @@ export class Reevit {
     this.connections = new ConnectionsService(this.client);
     this.subscriptions = new SubscriptionsService(this.client);
     this.fraud = new FraudService(this.client);
+    this.customers = new CustomersService(this.client);
+    this.paymentLinks = new PaymentLinksService(this.client);
+    this.webhooks = new WebhooksService(this.client);
+    this.routingRules = new RoutingRulesService(this.client);
+    this.invoices = new InvoicesService(this.client);
   }
 }
 

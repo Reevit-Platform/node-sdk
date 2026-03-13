@@ -68,10 +68,11 @@ const reevit = new Reevit(
 const payment = await reevit.payments.createIntent({
   amount: 5000,      // 50.00 GHS (amount in smallest currency unit)
   currency: 'GHS',
-  method: 'momo',
+  method: 'mobile_money',
   country: 'GH',
   customer_id: 'cust_123',
-  idempotencyKey: 'order_12345'
+}, {
+  idempotencyKey: 'order_12345',
 });
 
 console.log('Payment ID:', payment.id);
@@ -90,7 +91,7 @@ import { Reevit } from '@reevit/node';
 const reevit = new Reevit(
   'pfk_live_your_api_key',   // API Key (required)
   'org_your_org_id',          // Organization ID (required)
-  'https://api.reevit.io'  // Base URL (optional, defaults to localhost:8080)
+  'https://api.reevit.io'  // Base URL (optional, defaults to https://api.reevit.io)
 );
 ```
 
@@ -125,14 +126,15 @@ Create a new payment intent to initiate a transaction.
 const payment = await reevit.payments.createIntent({
   amount: 10000,           // 100.00 in smallest currency unit
   currency: 'GHS',         // Currency code (GHS, NGN, KES, USD)
-  method: 'momo',          // Payment method
+  method: 'mobile_money',  // Payment method
   country: 'GH',           // ISO country code
   customer_id: 'cust_123', // Optional: Your customer reference
-  idempotencyKey: 'order_456', // Optional: Safe retries / dedupe
   metadata: {              // Optional: Custom metadata
     order_id: 'order_456',
     product: 'Premium Plan'
   }
+}, {
+  idempotencyKey: 'order_456', // Optional: Safe retries / dedupe
 });
 ```
 

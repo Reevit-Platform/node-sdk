@@ -1,11 +1,16 @@
 {
   "name": "@reevit/node",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Reevit Node.js SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
