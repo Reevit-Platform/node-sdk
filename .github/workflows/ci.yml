@@ -29,6 +29,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck --if-present
 
+      - name: Check OpenAPI contract
+        run: npm run contract:check
+
       - name: Build
         run: npm run build
 

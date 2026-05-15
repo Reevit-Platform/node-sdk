@@ -8,7 +8,9 @@ import { PaymentLinksService } from './services/payment-links';
 import { WebhooksService } from './services/webhooks';
 import { RoutingRulesService } from './services/routing-rules';
 import { InvoicesService } from './services/invoices';
+import { CheckoutSessionsService } from './services/checkout-sessions';
 import { ReevitClientOptions } from './types';
+import { normalizeAxiosError } from './errors';
 
 // Default API base URLs (secure HTTPS)
 const API_BASE_URL_PRODUCTION = 'https://api.reevit.io';
@@ -32,6 +34,7 @@ export class Reevit {
   public webhooks: WebhooksService;
   public routingRules: RoutingRulesService;
   public invoices: InvoicesService;
+  public checkoutSessions: CheckoutSessionsService;
 
   constructor(
     apiKey: string,
@@ -51,13 +54,17 @@ export class Reevit {
       timeout: options.timeout || 10000,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'reevit-node/0.8.0',
+        'User-Agent': 'reevit-node/0.9.0',
         'X-Reevit-Client': '@reevit/node',
-        'X-Reevit-Client-Version': '0.8.1',
+        'X-Reevit-Client-Version': '0.9.0',
         'X-Reevit-Key': apiKey,
         'X-Org-Id': orgId,
       },
     });
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => Promise.reject(normalizeAxiosError(error))
+    );
 
     this.payments = new PaymentsService(this.client);
     this.connections = new ConnectionsService(this.client);
@@ -68,7 +75,9 @@ export class Reevit {
     this.webhooks = new WebhooksService(this.client);
     this.routingRules = new RoutingRulesService(this.client);
     this.invoices = new InvoicesService(this.client);
+    this.checkoutSessions = new CheckoutSessionsService(this.client);
   }
 }
 
 export * from './types';
+export * from './errors';

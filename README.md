@@ -36,7 +36,7 @@ The official Node.js/TypeScript SDK for [Reevit](https://reevit.io) — a unifie
 ## Installation
 
 ```bash
-npm install @reevit/node@0.7.0
+npm install @reevit/node@0.9.0
 ```
 
 Or using yarn:
@@ -77,6 +77,42 @@ const payment = await reevit.payments.createIntent({
 
 console.log('Payment ID:', payment.id);
 console.log('Status:', payment.status);
+```
+
+### Server-created checkout sessions
+
+Create checkout sessions on your server, then pass only `session.session_secret` to a browser SDK such as `@reevit/react`, `@reevit/vue`, or `@reevit/svelte`.
+
+```typescript
+const session = await reevit.checkoutSessions.create({
+  amount: 5000,
+  currency: 'GHS',
+  method: 'mobile_money',
+  country: 'GH',
+  customer_id: 'cust_123',
+  metadata: { order_id: '12345' },
+}, {
+  idempotencyKey: 'order_12345',
+});
+
+console.log(session.session_secret);
+```
+
+### Error handling
+
+Node throws `ReevitAPIError` for API and network failures. The error exposes `code`, `status`, `details`, `requestId`, and `recoverable`.
+
+```typescript
+import { ReevitAPIError } from '@reevit/node';
+
+try {
+  await reevit.checkoutSessions.create(payload, { idempotencyKey: 'order_12345' });
+} catch (error) {
+  if (error instanceof ReevitAPIError && error.recoverable) {
+    // retry or show a retry action
+  }
+  throw error;
+}
 ```
 
 ---
@@ -501,10 +537,10 @@ console.log('Policy updated successfully');
 
 ## Error Handling
 
-The SDK throws errors for failed API calls. Always wrap calls in try-catch blocks.
+The SDK throws `ReevitAPIError` for failed API calls. Always wrap calls in try-catch blocks.
 
 ```typescript
-import { AxiosError } from 'axios';
+import { ReevitAPIError } from '@reevit/node';
 
 async function createPaymentSafely() {
   try {
@@ -516,16 +552,16 @@ async function createPaymentSafely() {
     });
     return payment;
   } catch (error) {
-    if (error instanceof AxiosError) {
-      // API error
+    if (error instanceof ReevitAPIError) {
       console.error('API Error:', {
-        status: error.response?.status,
-        message: error.response?.data?.message || error.message,
-        code: error.response?.data?.code
+        status: error.status,
+        message: error.message,
+        code: error.code,
+        requestId: error.requestId,
+        recoverable: error.recoverable,
       });
 
-      // Handle specific error codes
-      switch (error.response?.status) {
+      switch (error.status) {
         case 400:
           console.error('Bad request - check your parameters');
           break;
@@ -558,7 +594,7 @@ async function createPaymentSafely() {
 
 ```typescript
 import { Payment, PaymentIntentRequest } from '@reevit/node';
-import { AxiosError } from 'axios';
+import { ReevitAPIError } from '@reevit/node';
 
 async function createPaymentWithRetry(
   data: PaymentIntentRequest,
@@ -573,11 +609,8 @@ async function createPaymentWithRetry(
     } catch (error) {
       lastError = error as Error;
       
-      if (error instanceof AxiosError) {
-        // Don't retry client errors (4xx)
-        if (error.response?.status && error.response.status < 500) {
-          throw error;
-        }
+      if (error instanceof ReevitAPIError && !error.recoverable) {
+        throw error;
       }
 
       if (attempt < maxRetries) {
@@ -1379,7 +1412,7 @@ REEVIT_WEBHOOK_SECRET=whsec_xxx  # Get from Dashboard > Developers > Webhooks
 
 ## Release Notes
 
-### v0.7.0
+### v0.9.0
 
 - Version alignment across all Reevit SDKs
 - Updated documentation and webhook examples

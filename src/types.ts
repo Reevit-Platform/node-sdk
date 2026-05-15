@@ -1,8 +1,9 @@
 export interface PaymentIntentRequest {
   amount: number;
   currency: string;
-  method: string;
+  method?: string;
   country: string;
+  description?: string;
   reference?: string;
   customer_id?: string;
   policy?: FraudPolicyInput;
@@ -40,6 +41,7 @@ export interface PaymentIntentResponse {
   provider_ref_id?: string;
   status: string;
   client_secret?: string;
+  session_secret?: string;
   psp_public_key?: string;
   psp_credentials?: Record<string, any>;
   amount: number;
@@ -55,6 +57,16 @@ export interface PaymentIntentResponse {
     countries?: string[];
   }>;
   branding?: Record<string, any>;
+}
+
+export interface CheckoutSessionRequest extends PaymentIntentRequest {}
+
+export interface CheckoutSession {
+  id: string;
+  client_secret: string;
+  session_secret: string;
+  payment_intent: PaymentIntentResponse;
+  expires_at?: string;
 }
 
 export interface Payment {
