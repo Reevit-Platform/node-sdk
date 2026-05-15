@@ -140,7 +140,7 @@ export class ReevitAPIClient {
           'Content-Type': 'application/json',
           'X-Reevit-Key': this.publicKey,
           'X-Reevit-Client': '@reevit/node',
-          'X-Reevit-Client-Version': '0.8.1',
+          'X-Reevit-Client-Version': '0.9.0',
           ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
         },
         timeout: this.timeout,
