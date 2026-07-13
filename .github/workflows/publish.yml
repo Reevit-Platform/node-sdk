@@ -64,16 +64,8 @@ jobs:
               sys.exit(1)
           PY
 
-      - name: Diagnose toolchain (temporary)
-        run: |
-          echo "node: $(node -v)"
-          echo "npm:  $(npm -v)   (which: $(which npm))"
-          echo "OIDC token URL present: ${ACTIONS_ID_TOKEN_REQUEST_URL:+yes}"
-          echo "--- effective npmrc (redacted) ---"
-          npm config get userconfig
-          sed -E 's/(_authToken=).*/\1<redacted>/' "$(npm config get userconfig)" 2>/dev/null || true
-
       - name: Publish to npm
-        run: npm publish --access public --loglevel verbose
+        run: npm publish --access public
         # Authenticated via OIDC trusted publishing (no NODE_AUTH_TOKEN);
-        # npm attaches build provenance automatically.
+        # npm attaches build provenance automatically. Requires a Trusted
+        # Publisher configured for @reevit/node on npmjs.com.
