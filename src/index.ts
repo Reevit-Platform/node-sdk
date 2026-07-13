@@ -81,3 +81,4 @@ export class Reevit {
 
 export * from './types';
 export * from './errors';
+export { verifyWebhookSignature, signWebhookPayload } from './webhook';
