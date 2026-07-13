@@ -1152,12 +1152,14 @@ Reevit signs webhooks with HMAC-SHA256:
 3. Copy the signing secret (starts with `whsec_`)
 4. Add to your environment: `REEVIT_WEBHOOK_SECRET=whsec_xxx...`
 
+The SDK ships a constant-time verifier — `verifyWebhookSignature(payload, signature, secret)` — so you do not have to reimplement HMAC. Pass the **raw** request body (`await request.text()`, not a parsed-and-reserialized object), the `X-Reevit-Signature` header, and your signing secret.
+
 ### Next.js App Router Webhook Handler
 
 ```typescript
 // app/api/webhooks/reevit/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
+import { verifyWebhookSignature } from "@reevit/node";
 
 // Webhook payload types
 interface PaymentData {
@@ -1190,32 +1192,14 @@ interface WebhookPayload {
   message?: string;
 }
 
-/**
- * Verify webhook signature using HMAC-SHA256
- * Always verify signatures in production to prevent spoofed webhooks
- */
-function verifySignature(payload: string, signature: string, secret: string): boolean {
-  if (!signature.startsWith("sha256=")) return false;
-  
-  const expected = crypto
-    .createHmac("sha256", secret)
-    .update(payload)
-    .digest("hex");
-  
-  const received = signature.slice(7);
-  if (received.length !== expected.length) return false;
-  
-  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected));
-}
-
 export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.text();
-    const signature = request.headers.get("x-reevit-signature") || "";
-    const secret = process.env.REEVIT_WEBHOOK_SECRET;
+    const signature = request.headers.get("x-reevit-signature");
+    const secret = process.env.REEVIT_WEBHOOK_SECRET || "";
 
     // Verify signature (required in production)
-    if (secret && !verifySignature(rawBody, signature, secret)) {
+    if (!verifyWebhookSignature(rawBody, signature, secret)) {
       console.error("[Webhook] Invalid signature");
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
@@ -1336,32 +1320,18 @@ async function handleSubscriptionCanceled(data: SubscriptionData) {
 
 ```typescript
 import express from 'express';
-import crypto from 'crypto';
+import { verifyWebhookSignature } from '@reevit/node';
 
 const app = express();
-
-function verifySignature(payload: string, signature: string, secret: string): boolean {
-  if (!signature.startsWith('sha256=')) return false;
-  
-  const expected = crypto
-    .createHmac('sha256', secret)
-    .update(payload)
-    .digest('hex');
-  
-  const received = signature.slice(7);
-  if (received.length !== expected.length) return false;
-  
-  return crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected));
-}
 
 // IMPORTANT: Use raw body for signature verification
 app.post('/webhooks/reevit', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
     const signature = req.headers['x-reevit-signature'] as string;
     const payload = req.body.toString();
-    const secret = process.env.REEVIT_WEBHOOK_SECRET!;
+    const secret = process.env.REEVIT_WEBHOOK_SECRET || '';
 
-    if (secret && !verifySignature(payload, signature, secret)) {
+    if (!verifyWebhookSignature(payload, signature, secret)) {
       return res.status(401).json({ error: 'Invalid signature' });
     }
 

@@ -13,6 +13,7 @@
     "contract:generate": "node scripts/generate-openapi-contract.mjs",
     "contract:check": "node scripts/check-openapi-contract.mjs",
     "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
