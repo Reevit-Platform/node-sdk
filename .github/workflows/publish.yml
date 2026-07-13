@@ -8,7 +8,9 @@ on:
 jobs:
   publish:
     name: Publish
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    # GitHub-hosted (not Blacksmith): npm provenance via Sigstore only supports
+    # github-hosted runners. Publish runs rarely, so it needn't be on Blacksmith.
+    runs-on: ubuntu-latest
     permissions:
       id-token: write   # mint the OIDC token npm trusts; enables provenance
       contents: read
