@@ -437,3 +437,114 @@ export interface InvoiceListOptions extends PaginationOptions {
 export interface InvoiceUpdateRequest {
   [key: string]: any;
 }
+
+export type PayoutStatus =
+  | 'pending'
+  | 'processing'
+  | 'succeeded'
+  | 'failed'
+  | 'reversed'
+  | 'canceled';
+
+export interface Beneficiary {
+  type: 'bank' | 'mobile_money';
+  name: string;
+  account_number?: string;
+  bank_code?: string;
+  phone?: string;
+  provider?: string;
+}
+
+export interface Payout {
+  id: string;
+  org_id: string;
+  mode: 'sandbox' | 'live';
+  connection_id: string;
+  provider: string;
+  amount: number;
+  currency: string;
+  status: PayoutStatus;
+  beneficiary: Beneficiary;
+  narration?: string;
+  reference: string;
+  provider_ref?: string;
+  failure_reason?: string;
+  metadata?: Record<string, any>;
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreatePayoutInput {
+  connection_id: string;
+  amount: number;
+  currency: string;
+  beneficiary?: Beneficiary;
+  beneficiary_id?: string;
+  narration?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PayoutListOptions extends PaginationOptions {
+  status?: PayoutStatus;
+}
+
+export interface PayoutListResponse extends PaginationOptions {
+  payouts: Payout[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface BulkPayoutItem {
+  amount: number;
+  beneficiary?: Beneficiary;
+  beneficiary_id?: string;
+  narration?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface BulkPayoutInput {
+  connection_id: string;
+  currency: string;
+  payouts: BulkPayoutItem[];
+}
+
+export interface BulkPayoutResult {
+  index: number;
+  payout?: Payout;
+  error?: string;
+}
+
+export interface BulkPayoutResponse {
+  results: BulkPayoutResult[];
+  total: number;
+  succeeded: number;
+  failed: number;
+}
+
+export interface PayoutBalance {
+  currency: string;
+  amount: number;
+}
+
+export interface AccountResolution {
+  account_name: string;
+  account_number?: string;
+}
+
+export interface SavedBeneficiary {
+  id: string;
+  org_id: string;
+  mode: 'sandbox' | 'live';
+  beneficiary: Beneficiary;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BeneficiaryListResponse {
+  beneficiaries: SavedBeneficiary[];
+  total: number;
+  limit: number;
+  offset: number;
+}

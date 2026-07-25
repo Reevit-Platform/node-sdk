@@ -9,6 +9,7 @@ import { WebhooksService } from './services/webhooks';
 import { RoutingRulesService } from './services/routing-rules';
 import { InvoicesService } from './services/invoices';
 import { CheckoutSessionsService } from './services/checkout-sessions';
+import { PayoutsService } from './services/payouts';
 import { ReevitClientOptions } from './types';
 import { normalizeAxiosError } from './errors';
 
@@ -35,6 +36,7 @@ export class Reevit {
   public routingRules: RoutingRulesService;
   public invoices: InvoicesService;
   public checkoutSessions: CheckoutSessionsService;
+  public payouts: PayoutsService;
 
   constructor(
     apiKey: string,
@@ -76,6 +78,7 @@ export class Reevit {
     this.routingRules = new RoutingRulesService(this.client);
     this.invoices = new InvoicesService(this.client);
     this.checkoutSessions = new CheckoutSessionsService(this.client);
+    this.payouts = new PayoutsService(this.client);
   }
 }
 
