@@ -410,6 +410,17 @@ connections.forEach(conn => {
   console.log(`  Labels: ${conn.labels.join(', ')}`);
   console.log(`  Countries: ${conn.routing_hints.country_preference.join(', ')}`);
 });
+
+// Follow pagination and fetch every matching PSP connection.
+const livePrimaryConnections = await reevit.connections.listAll({
+  mode: 'live',
+  status: 'active',
+  label: 'primary'
+});
+
+// Or retain pagination metadata for a single page.
+const page = await reevit.connections.listPage({ limit: 50, offset: 0 });
+console.log(page.pagination.total);
 ```
 
 ### Test Connection

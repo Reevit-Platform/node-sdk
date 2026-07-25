@@ -2,6 +2,19 @@
 
 All notable changes to `@reevit/typescript` will be documented in this file.
 
+## [0.10.0] - 2026-07-25
+
+### Added
+
+- Add payout resources.
+- Add paginated and automatic fetch-all merchant connection methods.
+- Add connection filters, label discovery, and complete response fields.
+
+### Fixed
+
+- Read credential-test success from the backend `ok` field.
+- Reject malformed wrapped connection-list responses.
+
 ## [Unreleased] - 2026-02-04
 
 ### 🛠 Improvements
