@@ -167,12 +167,15 @@ export interface Refund {
 }
 
 export interface ConnectionRequest {
+  id?: string;
   provider: string;
   mode: string;
+  status?: 'active' | 'inactive';
   credentials: Record<string, any>;
   capabilities?: Record<string, any>;
   routing_hints?: RoutingHints;
   labels?: string[];
+  workflow_id?: string;
 }
 
 export interface Connection {
@@ -180,15 +183,56 @@ export interface Connection {
   provider: string;
   mode: string;
   status: string;
-  capabilities: Record<string, any>;
-  routing_hints: RoutingHints;
+  capabilities?: Record<string, any>;
+  routing_hints?: RoutingHints;
   labels: string[];
+  workflow_id?: string;
+  fee_structure?: {
+    percentage?: number;
+    fixed?: number;
+    per_method?: Record<string, { percentage?: number; fixed?: number }>;
+    per_currency?: Record<string, { percentage?: number; fixed?: number }>;
+  };
+  total_calls?: number;
+  successful_calls?: number;
+  failed_calls?: number;
+  total_latency_ms?: number;
+  last_success_at?: string;
+  last_failure_at?: string;
+  health_score?: number;
+  health_status?: string;
+  last_validated_at?: string;
+  last_validation_status?: string;
+  last_validation_error?: string;
+  validation_failures?: number;
+  name_match_status?: 'unknown' | 'match' | 'mismatch';
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ConnectionListOptions extends PaginationOptions {
   label?: string;
   provider?: string;
+  mode?: string;
   status?: string;
+}
+
+export type ConnectionFilterOptions = Omit<ConnectionListOptions, 'limit' | 'offset'>;
+
+export interface ConnectionListPage {
+  connections: Connection[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+export interface ConnectionLabelStat {
+  label: string;
+  total: number;
+  providers?: Record<string, number>;
+  statuses?: Record<string, number>;
 }
 
 export interface ConnectionAuditEntry {

@@ -2907,6 +2907,13 @@ paths:
           schema:
             type: string
           description: Filter connections by status (active or inactive)
+        - name: mode
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [sandbox, live]
+          description: Filter connections by test or live mode
         - in: query
           name: limit
           schema:
@@ -7189,7 +7196,7 @@ components:
         id: { type: string }
         org_id: { type: string }
         connection_id: { type: string }
-        provider: { type: string, enum: [paystack, hubtel, flutterwave, monnify, mpesa, stripe] }
+        provider: { type: string, enum: [paystack, hubtel, flutterwave, monnify, mpesa, pawapay, moolre, stripe] }
         status: { type: string, enum: [pending, requires_action, authorized, partially_captured, succeeded, failed, canceled, disputed, refunded, partially_refunded, abandoned, expired] }
         client_secret: { type: string }
         psp_public_key: { type: string }
@@ -7633,7 +7640,7 @@ components:
       type: object
       properties:
         id: { type: string }
-        provider: { type: string, enum: [paystack, hubtel, flutterwave, monnify, mpesa, stripe] }
+        provider: { type: string, enum: [paystack, hubtel, flutterwave, monnify, mpesa, pawapay, moolre, stripe] }
         mode: { type: string, enum: [sandbox, live], default: live }
         status: { type: string, enum: [active, inactive], default: active }
         credentials: { type: object, additionalProperties: true }
@@ -7645,6 +7652,9 @@ components:
           description: Up to 20 lowercase labels (letters, numbers, -, _)
           items:
             type: string
+        workflow_id:
+          type: string
+          description: Optional workflow invoked for payments routed through this connection
       required: [provider, credentials]
     Connection:
       type: object
@@ -7659,6 +7669,7 @@ components:
         labels:
           type: array
           items: { type: string }
+        workflow_id: { type: string }
         fee_structure:
           $ref: '#/components/schemas/FeeStructure'
         total_calls: { type: integer, format: int64 }
@@ -7673,6 +7684,14 @@ components:
         last_validation_status: { type: string }
         last_validation_error: { type: string }
         validation_failures: { type: integer }
+        name_match_status:
+          type: string
+          enum: [unknown, match, mismatch]
+          description: >
+            Result of the PSP account-name verification check run after credential validation.
+            unknown — check has not run yet or the PSP does not support it.
+            match — the merchant's registered name matches the PSP account name.
+            mismatch — the names do not match; the connection may still be usable but should be reviewed.
         created_at: { type: string, format: date-time }
         updated_at: { type: string, format: date-time }
     FeatureValidation:
