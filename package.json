@@ -24,6 +24,10 @@
   ],
   "author": "Reevit",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reevit-Platform/node-sdk.git"
+  },
   "devDependencies": {
     "typescript": "^5.0.0",
     "@types/node": "^18.0.0"
