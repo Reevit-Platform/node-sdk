@@ -6,7 +6,7 @@ import {
   SubscriptionRequest,
   SubscriptionUpdateRequest,
 } from '../types';
-import { toRequestConfig } from './utils';
+import { extractArray, toRequestConfig } from './utils';
 
 export class SubscriptionsService {
   constructor(private client: AxiosInstance) { }
@@ -17,8 +17,8 @@ export class SubscriptionsService {
   }
 
   async list(options: SubscriptionListOptions = {}): Promise<Subscription[]> {
-    const response = await this.client.get<Subscription[]>('/v1/subscriptions', { params: options });
-    return response.data;
+    const response = await this.client.get<unknown>('/v1/subscriptions', { params: options });
+    return extractArray<Subscription>(response.data, 'subscriptions');
   }
 
   async get(id: string): Promise<Subscription> {
