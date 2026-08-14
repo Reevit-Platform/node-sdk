@@ -8,7 +8,7 @@ import {
   RequestOptions,
   Refund
 } from '../types';
-import { toRequestConfig } from './utils';
+import { extractArray, toRequestConfig } from './utils';
 
 export class PaymentsService {
   constructor(private client: AxiosInstance) { }
@@ -23,10 +23,10 @@ export class PaymentsService {
   }
 
   async list(limit: number = 50, offset: number = 0): Promise<PaymentSummary[]> {
-    const response = await this.client.get<PaymentSummary[]>('/v1/payments', {
+    const response = await this.client.get<unknown>('/v1/payments', {
       params: { limit, offset }
     });
-    return response.data;
+    return extractArray<PaymentSummary>(response.data, 'payments');
   }
 
   async get(id: string): Promise<Payment> {
