@@ -7156,6 +7156,9 @@ components:
               description: Customer email address (recommended for payment receipts).
         description:
           type: string
+        reference:
+          type: string
+          description: Merchant-defined reference returned with the payment intent and stored in payment metadata.
         capture_method:
           type: string
           enum: [automatic, manual]
@@ -7199,6 +7202,7 @@ components:
         provider: { type: string, enum: [paystack, hubtel, flutterwave, monnify, mpesa, pawapay, moolre, stripe] }
         status: { type: string, enum: [pending, requires_action, authorized, partially_captured, succeeded, failed, canceled, disputed, refunded, partially_refunded, abandoned, expired] }
         client_secret: { type: string }
+        reference: { type: string }
         psp_public_key: { type: string }
         psp_credentials:
           type: object
