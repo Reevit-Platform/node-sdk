@@ -14,7 +14,7 @@ import {
   RequestOptions,
   SavedBeneficiary,
 } from '../types';
-import { toRequestConfig } from './utils';
+import { extractArray, extractPage, toRequestConfig } from './utils';
 
 export class PayoutsService {
   constructor(private client: AxiosInstance) { }
@@ -26,8 +26,14 @@ export class PayoutsService {
   }
 
   async list(options: PayoutListOptions = {}): Promise<PayoutListResponse> {
-    const response = await this.client.get<PayoutListResponse>('/v1/payouts', { params: options });
-    return response.data;
+    const response = await this.client.get<unknown>('/v1/payouts', { params: options });
+    const page = extractPage<Payout>(response.data, 'payouts', options);
+    return {
+      payouts: page.items,
+      total: page.total,
+      limit: page.limit,
+      offset: page.offset,
+    };
   }
 
   async get(id: string): Promise<Payout> {
@@ -56,10 +62,10 @@ export class PayoutsService {
   }
 
   async balance(connectionId: string): Promise<PayoutBalance[]> {
-    const response = await this.client.get<{ balances: PayoutBalance[] }>('/v1/payouts/balance', {
+    const response = await this.client.get<unknown>('/v1/payouts/balance', {
       params: { connection_id: connectionId },
     });
-    return response.data.balances;
+    return extractArray<PayoutBalance>(response.data, 'balances');
   }
 
   async resolveAccount(connectionId: string, beneficiary: Beneficiary): Promise<AccountResolution> {
@@ -76,10 +82,16 @@ export class PayoutsService {
   }
 
   async listBeneficiaries(options: PaginationOptions = {}): Promise<BeneficiaryListResponse> {
-    const response = await this.client.get<BeneficiaryListResponse>('/v1/beneficiaries', {
+    const response = await this.client.get<unknown>('/v1/beneficiaries', {
       params: options,
     });
-    return response.data;
+    const page = extractPage<SavedBeneficiary>(response.data, 'beneficiaries', options);
+    return {
+      beneficiaries: page.items,
+      total: page.total,
+      limit: page.limit,
+      offset: page.offset,
+    };
   }
 
   async getBeneficiary(id: string): Promise<SavedBeneficiary> {
