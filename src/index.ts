@@ -12,16 +12,10 @@ import { CheckoutSessionsService } from './services/checkout-sessions';
 import { PayoutsService } from './services/payouts';
 import { ReevitClientOptions } from './types';
 import { normalizeAxiosError } from './errors';
+import { SDK_VERSION } from './version';
 
 // Default API base URLs (secure HTTPS)
 const API_BASE_URL_PRODUCTION = 'https://api.reevit.io';
-
-/**
- * Determines if an API key is for sandbox mode
- */
-function isSandboxKey(apiKey: string): boolean {
-  return apiKey.startsWith('pfk_test_');
-}
 
 export class Reevit {
   private client: AxiosInstance;
@@ -56,9 +50,9 @@ export class Reevit {
       timeout: options.timeout || 10000,
       headers: {
         'Content-Type': 'application/json',
-        'User-Agent': 'reevit-node/0.9.0',
+        'User-Agent': `reevit-node/${SDK_VERSION}`,
         'X-Reevit-Client': '@reevit/node',
-        'X-Reevit-Client-Version': '0.9.0',
+        'X-Reevit-Client-Version': SDK_VERSION,
         'X-Reevit-Key': apiKey,
         'X-Org-Id': orgId,
       },

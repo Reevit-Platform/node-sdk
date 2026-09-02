@@ -2,6 +2,29 @@
 
 All notable changes to `@reevit/typescript` will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- Derive the `User-Agent` and `X-Reevit-Client-Version` headers from
+  `package.json` via a generated `src/version.ts`, so requests report the real
+  package version instead of a hard-coded `0.9.0`.
+- Declare `engines.node >= 18` and an `exports` map (CommonJS only).
+- Bump `axios` to 1.20.0 within the existing `^1.4.0` range, clearing two high
+  advisories (axios prototype pollution, `form-data` CRLF injection). CI and the
+  publish workflow now fail on high advisories in runtime dependencies instead
+  of reporting them with `|| true`.
+- Bump the `@types/node` devDependency to `^22` to match the Node versions CI runs.
+- Import `node:crypto` rather than the bare `crypto` specifier in the webhook helpers.
+
+### Removed
+
+- Drop the unused, divergent `src/client.ts` (`ReevitAPIClient`), which nothing
+  imported but which was compiled into every publish, and the unused
+  `isSandboxKey` helper in `src/index.ts`.
+- Drop `dom` from the TypeScript `lib` list; this package is Node-only.
+
+
 ## [0.10.0] - 2026-07-25
 
 ### Added

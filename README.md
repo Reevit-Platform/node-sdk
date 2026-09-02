@@ -36,7 +36,7 @@ The official Node.js/TypeScript SDK for [Reevit](https://reevit.io) — a unifie
 ## Installation
 
 ```bash
-npm install @reevit/node@0.9.0
+npm install @reevit/node
 ```
 
 Or using yarn:
