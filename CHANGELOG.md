@@ -4,7 +4,46 @@ All notable changes to `@reevit/typescript` will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `constructEvent(rawBody, signature, secret, { toleranceSeconds, now })` —
+  verifies the signature, enforces the `signature_timestamp` replay window
+  (300s by default, both directions), parses the body and returns a
+  `ReevitWebhookEvent` union discriminated on `event`. Unknown event types fall
+  through to a generic shape. `verifyWebhookSignatureWithTolerance` is the
+  boolean variant.
+- `payments.list()` now accepts a `PaymentListOptions` object
+  (`{ limit, offset, status, customer_id, provider, ... }`), matching every
+  other list method. The positional `(limit, offset)` form still works and is
+  marked `@deprecated`.
+- `extractPage` and `tryExtractArray` helpers alongside `extractArray`.
+
+### Fixed
+
+- `payouts.list()`, `payouts.listBeneficiaries()` and `payouts.balance()` were
+  left out of the list-envelope migration. `balance()` in particular did
+  `response.data.balances` with no guard — an unhandled `TypeError` on the
+  money-out surface the day the `{ data, pagination }` envelope ships. All
+  three now read every supported shape.
+- Percent-encode every interpolated path segment across the service classes
+  (only `connections.ts` did before), so an id containing `/` or `?` can no
+  longer rewrite the route or smuggle a query string.
+
 ### Changed
+
+- **Behaviour change** — an unrecognised list-response shape now raises
+  `ReevitAPIError` with code `unexpected_response_shape` instead of returning
+  `[]`. A silent `[]` was indistinguishable from "this merchant has no
+  records", which would make a reconciliation or dunning sweep process nothing
+  and report success. A recognised-but-empty container, and an absent body
+  (204), still return `[]`.
+- **Behaviour change** — the four bare `throw new Error` sites (three
+  `connections.ts` shape guards and the `payouts` idempotency-key guard) now
+  throw `ReevitAPIError` with codes `unexpected_response_shape` and
+  `missing_idempotency_key`, so the documented
+  `catch (e) { if (isReevitAPIError(e)) ... }` pattern actually catches them.
+  Code that matched on `error.message` is unaffected; code that checked
+  `error.constructor === Error` is not.
 
 - Derive the `User-Agent` and `X-Reevit-Client-Version` headers from
   `package.json` via a generated `src/version.ts`, so requests report the real
