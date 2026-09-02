@@ -78,4 +78,24 @@ export class Reevit {
 
 export * from './types';
 export * from './errors';
-export { verifyWebhookSignature, signWebhookPayload } from './webhook';
+export {
+  verifyWebhookSignature,
+  verifyWebhookSignatureWithTolerance,
+  signWebhookPayload,
+  constructEvent,
+  DEFAULT_TOLERANCE_SECONDS,
+} from './webhook';
+export type {
+  ApiKeyWebhookEvent,
+  DisputeWebhookEvent,
+  OnboardingWebhookEvent,
+  PaymentWebhookEvent,
+  ReconciliationWebhookEvent,
+  ReevitWebhookEvent,
+  RefundWebhookEvent,
+  SubscriptionPausedWebhookEvent,
+  TestWebhookEvent,
+  UnknownWebhookEvent,
+  WebhookEventEnvelope,
+  WebhookToleranceOptions,
+} from './webhook';
