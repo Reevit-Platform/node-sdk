@@ -382,6 +382,28 @@ export interface PaymentLinkStats {
   [key: string]: any;
 }
 
+/**
+ * Filters accepted by `payments.list()`. Field names mirror the API's query
+ * string exactly; unknown keys are forwarded untouched so a new server-side
+ * filter needs no SDK release.
+ */
+export interface PaymentListOptions extends PaginationOptions {
+  status?: string;
+  customer_id?: string;
+  provider?: string;
+  method?: string;
+  search?: string;
+  currency?: string;
+  from?: string;
+  to?: string;
+  amount_min?: number;
+  amount_max?: number;
+  merchant_id?: string;
+  location_id?: string;
+  project_id?: string;
+  [key: string]: any;
+}
+
 export interface WebhookConfig {
   url: string;
   events?: string[];

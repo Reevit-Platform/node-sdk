@@ -3,6 +3,7 @@ import {
   Payment,
   PaymentIntentResponse,
   PaymentIntentRequest,
+  PaymentListOptions,
   PaymentStats,
   PaymentSummary,
   RequestOptions,
@@ -22,10 +23,30 @@ export class PaymentsService {
     return response.data;
   }
 
-  async list(limit: number = 50, offset: number = 0): Promise<PaymentSummary[]> {
-    const response = await this.client.get<unknown>('/v1/payments', {
-      params: { limit, offset }
-    });
+  /**
+   * Lists payments.
+   *
+   * @param options Filters and pagination, e.g.
+   *   `{ limit: 100, offset: 0, status: 'succeeded' }`. This is the form every
+   *   other list method in the package takes.
+   */
+  async list(options?: PaymentListOptions): Promise<PaymentSummary[]>;
+  /**
+   * @deprecated Pass a `PaymentListOptions` object instead:
+   *   `list({ limit, offset })`. The positional form cannot express any of the
+   *   server-side filters and will be removed in the next major version.
+   */
+  async list(limit: number, offset?: number): Promise<PaymentSummary[]>;
+  async list(
+    optionsOrLimit: PaymentListOptions | number = {},
+    maybeOffset?: number,
+  ): Promise<PaymentSummary[]> {
+    const params: PaymentListOptions =
+      typeof optionsOrLimit === 'number'
+        ? { limit: optionsOrLimit, offset: maybeOffset ?? 0 }
+        : { limit: 50, offset: 0, ...optionsOrLimit };
+
+    const response = await this.client.get<unknown>('/v1/payments', { params });
     return extractArray<PaymentSummary>(response.data, 'payments');
   }
 
