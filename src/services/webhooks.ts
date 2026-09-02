@@ -38,13 +38,13 @@ export class WebhooksService {
   }
 
   async getEvent(id: string): Promise<WebhookEvent> {
-    const response = await this.client.get<WebhookEvent>(`/v1/webhooks/events/${id}`);
+    const response = await this.client.get<WebhookEvent>(`/v1/webhooks/events/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async replayEvent(id: string, requestOptions?: RequestOptions): Promise<Record<string, any>> {
     const response = await this.client.post<Record<string, any>>(
-      `/v1/webhooks/events/${id}/replay`,
+      `/v1/webhooks/events/${encodeURIComponent(id)}/replay`,
       {},
       toRequestConfig(requestOptions)
     );
@@ -57,7 +57,7 @@ export class WebhooksService {
   }
 
   async getOutbound(id: string): Promise<OutboundWebhook> {
-    const response = await this.client.get<OutboundWebhook>(`/v1/webhooks/outbound/${id}`);
+    const response = await this.client.get<OutboundWebhook>(`/v1/webhooks/outbound/${encodeURIComponent(id)}`);
     return response.data;
   }
 }

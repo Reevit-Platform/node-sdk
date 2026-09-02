@@ -25,17 +25,17 @@ export class CustomersService {
   }
 
   async get(id: string): Promise<Customer> {
-    const response = await this.client.get<Customer>(`/v1/customers/${id}`);
+    const response = await this.client.get<Customer>(`/v1/customers/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async update(id: string, data: UpdateCustomerInput, requestOptions?: RequestOptions): Promise<Customer> {
-    const response = await this.client.patch<Customer>(`/v1/customers/${id}`, data, toRequestConfig(requestOptions));
+    const response = await this.client.patch<Customer>(`/v1/customers/${encodeURIComponent(id)}`, data, toRequestConfig(requestOptions));
     return response.data;
   }
 
   async delete(id: string, requestOptions?: RequestOptions): Promise<void> {
-    await this.client.delete(`/v1/customers/${id}`, toRequestConfig(requestOptions));
+    await this.client.delete(`/v1/customers/${encodeURIComponent(id)}`, toRequestConfig(requestOptions));
   }
 
   async lookup(externalId: string): Promise<Customer> {
@@ -51,7 +51,7 @@ export class CustomersService {
   }
 
   async getPaymentHistory(id: string, options: PaginationOptions = {}): Promise<PaymentSummary[]> {
-    const response = await this.client.get(`/v1/customers/${id}/payments`, { params: options });
+    const response = await this.client.get(`/v1/customers/${encodeURIComponent(id)}/payments`, { params: options });
     return extractArray<PaymentSummary>(response.data, 'payments');
   }
 }

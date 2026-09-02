@@ -38,17 +38,17 @@ export class PayoutsService {
   }
 
   async get(id: string): Promise<Payout> {
-    const response = await this.client.get<Payout>(`/v1/payouts/${id}`);
+    const response = await this.client.get<Payout>(`/v1/payouts/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async confirm(id: string): Promise<Payout> {
-    const response = await this.client.post<Payout>(`/v1/payouts/${id}/confirm`, {});
+    const response = await this.client.post<Payout>(`/v1/payouts/${encodeURIComponent(id)}/confirm`, {});
     return response.data;
   }
 
   async cancel(id: string): Promise<Payout> {
-    const response = await this.client.post<Payout>(`/v1/payouts/${id}/cancel`, {});
+    const response = await this.client.post<Payout>(`/v1/payouts/${encodeURIComponent(id)}/cancel`, {});
     return response.data;
   }
 
@@ -96,12 +96,12 @@ export class PayoutsService {
   }
 
   async getBeneficiary(id: string): Promise<SavedBeneficiary> {
-    const response = await this.client.get<SavedBeneficiary>(`/v1/beneficiaries/${id}`);
+    const response = await this.client.get<SavedBeneficiary>(`/v1/beneficiaries/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async deleteBeneficiary(id: string): Promise<void> {
-    await this.client.delete(`/v1/beneficiaries/${id}`);
+    await this.client.delete(`/v1/beneficiaries/${encodeURIComponent(id)}`);
   }
 
   private requireIdempotencyKey(options: RequestOptions): void {

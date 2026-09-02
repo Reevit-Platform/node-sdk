@@ -16,18 +16,18 @@ export class InvoicesService {
   }
 
   async get(id: string): Promise<Invoice> {
-    const response = await this.client.get<Invoice>(`/v1/invoices/${id}`);
+    const response = await this.client.get<Invoice>(`/v1/invoices/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async update(id: string, data: InvoiceUpdateRequest, requestOptions?: RequestOptions): Promise<Invoice> {
-    const response = await this.client.patch<Invoice>(`/v1/invoices/${id}`, data, toRequestConfig(requestOptions));
+    const response = await this.client.patch<Invoice>(`/v1/invoices/${encodeURIComponent(id)}`, data, toRequestConfig(requestOptions));
     return response.data;
   }
 
   async cancel(id: string, requestOptions?: RequestOptions): Promise<Invoice> {
     const response = await this.client.post<Invoice>(
-      `/v1/invoices/${id}/cancel`,
+      `/v1/invoices/${encodeURIComponent(id)}/cancel`,
       {},
       toRequestConfig(requestOptions)
     );
@@ -36,7 +36,7 @@ export class InvoicesService {
 
   async retry(id: string, requestOptions?: RequestOptions): Promise<Invoice> {
     const response = await this.client.post<Invoice>(
-      `/v1/invoices/${id}/retry`,
+      `/v1/invoices/${encodeURIComponent(id)}/retry`,
       {},
       toRequestConfig(requestOptions)
     );

@@ -25,31 +25,31 @@ export class PaymentLinksService {
   }
 
   async get(id: string): Promise<PaymentLink> {
-    const response = await this.client.get<PaymentLink>(`/v1/payment-links/${id}`);
+    const response = await this.client.get<PaymentLink>(`/v1/payment-links/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async update(id: string, data: UpdatePaymentLinkInput, requestOptions?: RequestOptions): Promise<PaymentLink> {
-    const response = await this.client.patch<PaymentLink>(`/v1/payment-links/${id}`, data, toRequestConfig(requestOptions));
+    const response = await this.client.patch<PaymentLink>(`/v1/payment-links/${encodeURIComponent(id)}`, data, toRequestConfig(requestOptions));
     return response.data;
   }
 
   async delete(id: string, requestOptions?: RequestOptions): Promise<void> {
-    await this.client.delete(`/v1/payment-links/${id}`, toRequestConfig(requestOptions));
+    await this.client.delete(`/v1/payment-links/${encodeURIComponent(id)}`, toRequestConfig(requestOptions));
   }
 
   async getStats(id: string): Promise<PaymentLinkStats> {
-    const response = await this.client.get<PaymentLinkStats>(`/v1/payment-links/${id}/stats`);
+    const response = await this.client.get<PaymentLinkStats>(`/v1/payment-links/${encodeURIComponent(id)}/stats`);
     return response.data;
   }
 
   async listPayments(id: string, options: PaginationOptions = {}): Promise<PaymentSummary[]> {
-    const response = await this.client.get(`/v1/payment-links/${id}/payments`, { params: options });
+    const response = await this.client.get(`/v1/payment-links/${encodeURIComponent(id)}/payments`, { params: options });
     return extractArray<PaymentSummary>(response.data, 'payments');
   }
 
   async getByCode(code: string): Promise<PaymentLink> {
-    const response = await this.client.get<PaymentLink>(`/v1/pay/${code}`);
+    const response = await this.client.get<PaymentLink>(`/v1/pay/${encodeURIComponent(code)}`);
     return response.data;
   }
 }

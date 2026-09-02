@@ -65,3 +65,29 @@ test('payments.list defaults to limit=50 offset=0 with no arguments', async () =
   });
   assert.deepEqual(seen[0], { limit: '50', offset: '0' });
 });
+
+test('path ids are percent-encoded, not spliced into the route', async () => {
+  // Without encodeURIComponent this id would rewrite the route to
+  // /v1/payments/../../v1/admin and smuggle a query string.
+  const hostileId = '../../v1/admin?x=1';
+  const seenUrls = [];
+
+  await withServer(
+    (request, response) => {
+      seenUrls.push(request.url);
+      response.setHeader('content-type', 'application/json');
+      response.end(JSON.stringify({ id: 'pay_1' }));
+    },
+    async (baseUrl) => {
+      const client = new Reevit('pfk_test_key', 'org_123', baseUrl);
+      await client.payments.get(hostileId);
+      await client.payments.cancel(hostileId);
+    },
+  );
+
+  assert.equal(seenUrls[0], '/v1/payments/..%2F..%2Fv1%2Fadmin%3Fx%3D1');
+  assert.equal(seenUrls[1], '/v1/payments/..%2F..%2Fv1%2Fadmin%3Fx%3D1/cancel');
+  for (const url of seenUrls) {
+    assert.ok(!url.includes('?'), `query smuggled through: ${url}`);
+  }
+});
