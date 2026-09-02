@@ -12,6 +12,7 @@ import {
   RequestOptions,
 } from '../types';
 import { extractArray, toRequestConfig } from './utils';
+import { ReevitAPIError } from '../errors';
 
 export class ConnectionsService {
   constructor(private client: AxiosInstance) { }
@@ -72,7 +73,10 @@ export class ConnectionsService {
   async listLabels(): Promise<ConnectionLabelStat[]> {
     const response = await this.client.get<ConnectionLabelStat[]>('/v1/connections/labels');
     if (!Array.isArray(response.data)) {
-      throw new Error('unexpected connection labels response: expected an array');
+      throw new ReevitAPIError(
+        'unexpected connection labels response: expected an array',
+        { code: 'unexpected_response_shape', status: 0 },
+      );
     }
     return response.data;
   }
@@ -117,12 +121,18 @@ export class ConnectionsService {
     }
 
     if (!data || typeof data !== 'object') {
-      throw new Error('unexpected connections response: expected an object');
+      throw new ReevitAPIError(
+        'unexpected connections response: expected an object',
+        { code: 'unexpected_response_shape', status: 0 },
+      );
     }
 
     const payload = data as Record<string, unknown>;
     if (!Array.isArray(payload.connections)) {
-      throw new Error('unexpected connections response: missing connections array');
+      throw new ReevitAPIError(
+        'unexpected connections response: missing connections array',
+        { code: 'unexpected_response_shape', status: 0 },
+      );
     }
 
     const pagination =

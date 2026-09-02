@@ -15,6 +15,7 @@ import {
   SavedBeneficiary,
 } from '../types';
 import { extractArray, extractPage, toRequestConfig } from './utils';
+import { ReevitAPIError } from '../errors';
 
 export class PayoutsService {
   constructor(private client: AxiosInstance) { }
@@ -105,7 +106,11 @@ export class PayoutsService {
 
   private requireIdempotencyKey(options: RequestOptions): void {
     if (!options?.idempotencyKey?.trim()) {
-      throw new Error('idempotencyKey is required for payout creation');
+      throw new ReevitAPIError('idempotencyKey is required for payout creation', {
+        code: 'missing_idempotency_key',
+        status: 0,
+        recoverable: false,
+      });
     }
   }
 }

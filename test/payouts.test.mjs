@@ -175,3 +175,22 @@ test('payouts.listBeneficiaries reads both shapes', async () => {
     },
   );
 });
+
+test('the idempotency-key guard throws a typed ReevitAPIError', async () => {
+  const client = new Reevit('pfk_test_key', 'org_123', 'http://127.0.0.1:1');
+
+  for (const call of [
+    () => client.payouts.create({ connection_id: 'c', amount: 1, currency: 'GHS' }, { idempotencyKey: '  ' }),
+    () => client.payouts.createBulk({ connection_id: 'c', currency: 'GHS', payouts: [] }, {}),
+  ]) {
+    await assert.rejects(call, (error) => {
+      // The documented `catch (e) { if (isReevitAPIError(e)) ... }` pattern
+      // has to catch this — it is the guard most likely to fire in ordinary
+      // integration work.
+      assert.ok(isReevitAPIError(error), 'expected a ReevitAPIError');
+      assert.equal(error.code, 'missing_idempotency_key');
+      assert.equal(error.recoverable, false);
+      return true;
+    });
+  }
+});
