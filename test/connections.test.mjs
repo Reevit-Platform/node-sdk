@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 
-import { Reevit } from '../dist/index.js';
+import { Reevit, isReevitAPIError } from '../dist/index.js';
 
 async function withServer(handler, run) {
   const server = http.createServer(handler);
@@ -111,4 +111,30 @@ test('listLabels fetches merchant connection label statistics', async () => {
       ]);
     },
   );
+});
+
+test('connections list/labels shape guards throw a typed ReevitAPIError', async () => {
+  const cases = [
+    ['/v1/connections', '"not an object"', (client) => client.connections.listPage()],
+    ['/v1/connections', '{"items":[]}', (client) => client.connections.listPage()],
+    ['/v1/connections/labels', '{"labels":[]}', (client) => client.connections.listLabels()],
+  ];
+
+  for (const [path, body, call] of cases) {
+    await withServer(
+      (request, response) => {
+        assert.equal(request.url.split('?')[0], path);
+        response.setHeader('content-type', 'application/json');
+        response.end(body);
+      },
+      async (baseUrl) => {
+        const client = new Reevit('pfk_test_key', 'org_123', baseUrl);
+        await assert.rejects(call(client), (error) => {
+          assert.ok(isReevitAPIError(error), `expected a ReevitAPIError for ${body}`);
+          assert.equal(error.code, 'unexpected_response_shape');
+          return true;
+        });
+      },
+    );
+  }
 });

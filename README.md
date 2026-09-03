@@ -36,7 +36,7 @@ The official Node.js/TypeScript SDK for [Reevit](https://reevit.io) — a unifie
 ## Installation
 
 ```bash
-npm install @reevit/node@0.9.0
+npm install @reevit/node
 ```
 
 Or using yarn:
@@ -1164,6 +1164,51 @@ Reevit signs webhooks with HMAC-SHA256:
 4. Add to your environment: `REEVIT_WEBHOOK_SECRET=whsec_xxx...`
 
 The SDK ships a constant-time verifier — `verifyWebhookSignature(payload, signature, secret)` — so you do not have to reimplement HMAC. Pass the **raw** request body (`await request.text()`, not a parsed-and-reserialized object), the `X-Reevit-Signature` header, and your signing secret.
+
+### `constructEvent` — verify, replay-check and parse in one call
+
+`verifyWebhookSignature` checks the HMAC and nothing else. Every signed
+delivery also carries a `signature_timestamp`, and the reason it is there is so
+you can reject a captured-but-recent delivery that an attacker replays. Rather
+than have every integration hand-roll that check, use `constructEvent`:
+
+```typescript
+import { constructEvent, isReevitAPIError } from "@reevit/node";
+
+try {
+  const event = constructEvent(rawBody, signature, secret); // 300s window by default
+
+  switch (event.event) {
+    case "payment.updated":
+      await handlePayment(event.data);
+      break;
+    case "refund.succeeded":
+      await handleRefund(event.data);
+      break;
+    default:
+      // New event types ship without an SDK release — this is not an error.
+      break;
+  }
+} catch (error) {
+  if (isReevitAPIError(error)) {
+    // invalid_webhook_signature | invalid_webhook_payload |
+    // missing_signature_timestamp | invalid_signature_timestamp |
+    // webhook_timestamp_out_of_tolerance
+    return new Response("rejected", { status: 400 });
+  }
+  throw error;
+}
+```
+
+Options: `constructEvent(rawBody, signature, secret, { toleranceSeconds, now })`.
+`toleranceSeconds` defaults to `300` and applies in both directions (the future
+side absorbs clock skew); `0` skips the timestamp check. `now` overrides the
+clock and exists for tests. `verifyWebhookSignatureWithTolerance(...)` is the
+same check with a `boolean` return and no parsing.
+
+The event name is on **`event`**, not `type`. `onboarding.*` deliveries ship
+without an envelope and therefore have no `event` field — they arrive as the
+generic `UnknownWebhookEvent` shape.
 
 ### Next.js App Router Webhook Handler
 

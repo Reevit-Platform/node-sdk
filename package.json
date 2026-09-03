@@ -4,11 +4,22 @@
   "description": "Reevit Node.js SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
+    "prebuild": "node -e \"const v=require('./package.json').version;require('fs').writeFileSync('src/version.ts','// Generated from package.json by the prebuild script. Do not edit by hand.\\nexport const SDK_VERSION = '+JSON.stringify(v)+';\\n')\"",
     "build": "tsc",
     "contract:generate": "node scripts/generate-openapi-contract.mjs",
     "contract:check": "node scripts/check-openapi-contract.mjs",
@@ -34,7 +45,7 @@
   },
   "devDependencies": {
     "typescript": "^5.0.0",
-    "@types/node": "^18.0.0"
+    "@types/node": "^22.0.0"
   },
   "dependencies": {
     "axios": "^1.4.0"

@@ -22,13 +22,13 @@ export class SubscriptionsService {
   }
 
   async get(id: string): Promise<Subscription> {
-    const response = await this.client.get<Subscription>(`/v1/subscriptions/${id}`);
+    const response = await this.client.get<Subscription>(`/v1/subscriptions/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async update(id: string, data: SubscriptionUpdateRequest, requestOptions?: RequestOptions): Promise<Subscription> {
     const response = await this.client.patch<Subscription>(
-      `/v1/subscriptions/${id}`,
+      `/v1/subscriptions/${encodeURIComponent(id)}`,
       data,
       toRequestConfig(requestOptions)
     );
@@ -37,7 +37,7 @@ export class SubscriptionsService {
 
   async cancel(id: string, requestOptions?: RequestOptions): Promise<Subscription> {
     const response = await this.client.post<Subscription>(
-      `/v1/subscriptions/${id}/cancel`,
+      `/v1/subscriptions/${encodeURIComponent(id)}/cancel`,
       {},
       toRequestConfig(requestOptions)
     );
@@ -46,7 +46,7 @@ export class SubscriptionsService {
 
   async resume(id: string, requestOptions?: RequestOptions): Promise<Subscription> {
     const response = await this.client.post<Subscription>(
-      `/v1/subscriptions/${id}/resume`,
+      `/v1/subscriptions/${encodeURIComponent(id)}/resume`,
       {},
       toRequestConfig(requestOptions)
     );

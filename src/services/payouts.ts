@@ -14,7 +14,8 @@ import {
   RequestOptions,
   SavedBeneficiary,
 } from '../types';
-import { toRequestConfig } from './utils';
+import { extractArray, extractPage, toRequestConfig } from './utils';
+import { ReevitAPIError } from '../errors';
 
 export class PayoutsService {
   constructor(private client: AxiosInstance) { }
@@ -26,22 +27,28 @@ export class PayoutsService {
   }
 
   async list(options: PayoutListOptions = {}): Promise<PayoutListResponse> {
-    const response = await this.client.get<PayoutListResponse>('/v1/payouts', { params: options });
-    return response.data;
+    const response = await this.client.get<unknown>('/v1/payouts', { params: options });
+    const page = extractPage<Payout>(response.data, 'payouts', options);
+    return {
+      payouts: page.items,
+      total: page.total,
+      limit: page.limit,
+      offset: page.offset,
+    };
   }
 
   async get(id: string): Promise<Payout> {
-    const response = await this.client.get<Payout>(`/v1/payouts/${id}`);
+    const response = await this.client.get<Payout>(`/v1/payouts/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async confirm(id: string): Promise<Payout> {
-    const response = await this.client.post<Payout>(`/v1/payouts/${id}/confirm`, {});
+    const response = await this.client.post<Payout>(`/v1/payouts/${encodeURIComponent(id)}/confirm`, {});
     return response.data;
   }
 
   async cancel(id: string): Promise<Payout> {
-    const response = await this.client.post<Payout>(`/v1/payouts/${id}/cancel`, {});
+    const response = await this.client.post<Payout>(`/v1/payouts/${encodeURIComponent(id)}/cancel`, {});
     return response.data;
   }
 
@@ -56,10 +63,10 @@ export class PayoutsService {
   }
 
   async balance(connectionId: string): Promise<PayoutBalance[]> {
-    const response = await this.client.get<{ balances: PayoutBalance[] }>('/v1/payouts/balance', {
+    const response = await this.client.get<unknown>('/v1/payouts/balance', {
       params: { connection_id: connectionId },
     });
-    return response.data.balances;
+    return extractArray<PayoutBalance>(response.data, 'balances');
   }
 
   async resolveAccount(connectionId: string, beneficiary: Beneficiary): Promise<AccountResolution> {
@@ -76,24 +83,34 @@ export class PayoutsService {
   }
 
   async listBeneficiaries(options: PaginationOptions = {}): Promise<BeneficiaryListResponse> {
-    const response = await this.client.get<BeneficiaryListResponse>('/v1/beneficiaries', {
+    const response = await this.client.get<unknown>('/v1/beneficiaries', {
       params: options,
     });
-    return response.data;
+    const page = extractPage<SavedBeneficiary>(response.data, 'beneficiaries', options);
+    return {
+      beneficiaries: page.items,
+      total: page.total,
+      limit: page.limit,
+      offset: page.offset,
+    };
   }
 
   async getBeneficiary(id: string): Promise<SavedBeneficiary> {
-    const response = await this.client.get<SavedBeneficiary>(`/v1/beneficiaries/${id}`);
+    const response = await this.client.get<SavedBeneficiary>(`/v1/beneficiaries/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async deleteBeneficiary(id: string): Promise<void> {
-    await this.client.delete(`/v1/beneficiaries/${id}`);
+    await this.client.delete(`/v1/beneficiaries/${encodeURIComponent(id)}`);
   }
 
   private requireIdempotencyKey(options: RequestOptions): void {
     if (!options?.idempotencyKey?.trim()) {
-      throw new Error('idempotencyKey is required for payout creation');
+      throw new ReevitAPIError('idempotencyKey is required for payout creation', {
+        code: 'missing_idempotency_key',
+        status: 0,
+        recoverable: false,
+      });
     }
   }
 }

@@ -21,16 +21,16 @@ export class RoutingRulesService {
   }
 
   async get(id: string): Promise<RoutingRule> {
-    const response = await this.client.get<RoutingRule>(`/v1/routing-rules/${id}`);
+    const response = await this.client.get<RoutingRule>(`/v1/routing-rules/${encodeURIComponent(id)}`);
     return response.data;
   }
 
   async update(id: string, data: RoutingRuleUpdateRequest, requestOptions?: RequestOptions): Promise<RoutingRule> {
-    const response = await this.client.patch<RoutingRule>(`/v1/routing-rules/${id}`, data, toRequestConfig(requestOptions));
+    const response = await this.client.patch<RoutingRule>(`/v1/routing-rules/${encodeURIComponent(id)}`, data, toRequestConfig(requestOptions));
     return response.data;
   }
 
   async delete(id: string, requestOptions?: RequestOptions): Promise<void> {
-    await this.client.delete(`/v1/routing-rules/${id}`, toRequestConfig(requestOptions));
+    await this.client.delete(`/v1/routing-rules/${encodeURIComponent(id)}`, toRequestConfig(requestOptions));
   }
 }

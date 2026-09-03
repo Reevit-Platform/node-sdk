@@ -3,6 +3,7 @@ import {
   Payment,
   PaymentIntentResponse,
   PaymentIntentRequest,
+  PaymentListOptions,
   PaymentStats,
   PaymentSummary,
   RequestOptions,
@@ -22,15 +23,35 @@ export class PaymentsService {
     return response.data;
   }
 
-  async list(limit: number = 50, offset: number = 0): Promise<PaymentSummary[]> {
-    const response = await this.client.get<unknown>('/v1/payments', {
-      params: { limit, offset }
-    });
+  /**
+   * Lists payments.
+   *
+   * @param options Filters and pagination, e.g.
+   *   `{ limit: 100, offset: 0, status: 'succeeded' }`. This is the form every
+   *   other list method in the package takes.
+   */
+  async list(options?: PaymentListOptions): Promise<PaymentSummary[]>;
+  /**
+   * @deprecated Pass a `PaymentListOptions` object instead:
+   *   `list({ limit, offset })`. The positional form cannot express any of the
+   *   server-side filters and will be removed in the next major version.
+   */
+  async list(limit: number, offset?: number): Promise<PaymentSummary[]>;
+  async list(
+    optionsOrLimit: PaymentListOptions | number = {},
+    maybeOffset?: number,
+  ): Promise<PaymentSummary[]> {
+    const params: PaymentListOptions =
+      typeof optionsOrLimit === 'number'
+        ? { limit: optionsOrLimit, offset: maybeOffset ?? 0 }
+        : { limit: 50, offset: 0, ...optionsOrLimit };
+
+    const response = await this.client.get<unknown>('/v1/payments', { params });
     return extractArray<PaymentSummary>(response.data, 'payments');
   }
 
   async get(id: string): Promise<Payment> {
-    const response = await this.client.get<Payment>(`/v1/payments/${id}`);
+    const response = await this.client.get<Payment>(`/v1/payments/${encodeURIComponent(id)}`);
     return response.data;
   }
 
@@ -40,7 +61,7 @@ export class PaymentsService {
     requestOptions?: RequestOptions
   ): Promise<Payment> {
     const response = await this.client.patch<Payment>(
-      `/v1/payments/intents/${id}`,
+      `/v1/payments/intents/${encodeURIComponent(id)}`,
       data,
       toRequestConfig(requestOptions)
     );
@@ -49,7 +70,7 @@ export class PaymentsService {
 
   async confirm(id: string, requestOptions?: RequestOptions): Promise<Payment> {
     const response = await this.client.post<Payment>(
-      `/v1/payments/${id}/confirm`,
+      `/v1/payments/${encodeURIComponent(id)}/confirm`,
       {},
       toRequestConfig(requestOptions)
     );
@@ -58,7 +79,7 @@ export class PaymentsService {
 
   async confirmIntent(id: string, clientSecret: string, requestOptions?: RequestOptions): Promise<Payment> {
     const response = await this.client.post<Payment>(
-      `/v1/payments/${id}/confirm-intent`,
+      `/v1/payments/${encodeURIComponent(id)}/confirm-intent`,
       {},
       {
         ...(toRequestConfig(requestOptions) || {}),
@@ -70,7 +91,7 @@ export class PaymentsService {
 
   async cancel(id: string, requestOptions?: RequestOptions): Promise<Payment> {
     const response = await this.client.post<Payment>(
-      `/v1/payments/${id}/cancel`,
+      `/v1/payments/${encodeURIComponent(id)}/cancel`,
       {},
       toRequestConfig(requestOptions)
     );
@@ -79,7 +100,7 @@ export class PaymentsService {
 
   async retry(id: string, requestOptions?: RequestOptions): Promise<Payment> {
     const response = await this.client.post<Payment>(
-      `/v1/payments/${id}/retry`,
+      `/v1/payments/${encodeURIComponent(id)}/retry`,
       {},
       toRequestConfig(requestOptions)
     );
@@ -87,7 +108,7 @@ export class PaymentsService {
   }
 
   async refund(id: string, amount?: number, reason?: string, requestOptions?: RequestOptions): Promise<Refund> {
-    const response = await this.client.post<Refund>(`/v1/payments/${id}/refund`, {
+    const response = await this.client.post<Refund>(`/v1/payments/${encodeURIComponent(id)}/refund`, {
       amount,
       reason
     }, toRequestConfig(requestOptions));
