@@ -1,6 +1,18 @@
 # Changelog
 
-All notable changes to `@reevit/typescript` will be documented in this file.
+All notable changes to `@reevit/node` will be documented in this file.
+
+## [0.10.2] - 2026-08-14
+
+### Fixed
+
+- List responses are forward-compatible with the list envelope.
+
+## [0.10.1] - 2026-08-14
+
+### Changed
+
+- The bundled OpenAPI contract exposes the checkout reference.
 
 ## [Unreleased]
 
@@ -77,11 +89,45 @@ All notable changes to `@reevit/typescript` will be documented in this file.
 - Read credential-test success from the backend `ok` field.
 - Reject malformed wrapped connection-list responses.
 
-## [Unreleased] - 2026-02-04
+### Changed
+
+- Added `repository`, `homepage` and `bugs` to `package.json`.
+- Publishing moved to npm OIDC trusted publishing on a GitHub-hosted runner.
+
+## [0.9.0] - 2026-07-13
+
+### Added
+
+- Checkout sessions: a `checkoutSessions` service, checkout-session types and
+  the bundled OpenAPI contract.
+- Webhook signature verification helpers.
+
+### Changed
+
+- CI workflows migrated to Blacksmith runners.
+
+## [0.8.1] - 2026-03-13
+
+### Added
+
+- Service-oriented client surface: customers, invoices, payment links, routing
+  rules, webhooks and shared utils services, alongside expanded connections,
+  payments and subscriptions services.
+
+## [0.8.0] - 2026-03-03
+
+### Added
+
+- `provider_ref_id` on the payment intent response types.
+
+## [0.7.0] - 2026-02-07
 
 ### 🛠 Improvements
 
 - Added `idempotencyKey` support for payment intent creation.
+
+> There was no `0.6.0` release of this package; the manifest went from `0.5.0`
+> straight to `0.7.0`.
 
 ## [0.5.0] - 2026-01-11
 
