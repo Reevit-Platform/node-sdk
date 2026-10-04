@@ -6,6 +6,7 @@ All notable changes to `@reevit/node` will be documented in this file.
 
 ### Fixed
 
+- `fraud.update(policy, requestOptions)` can send the required stable operation key. The update sends only fields accepted by the standalone policy decoder; legacy `prefer` remains an optional deprecated input and is not sent to this endpoint. Provider preferences belong in payment-intent policy.
 - Release the existing list-response parser fix: unsupported response shapes raise `unexpected_response_shape` instead of silently returning an empty list.
 - Release the existing version-header fix: `User-Agent` and `X-Reevit-Client-Version` use the package version generated during the build.
 - Verify those behaviors against the packed npm archive with `npm run test:package` before publishing.

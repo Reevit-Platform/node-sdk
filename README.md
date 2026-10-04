@@ -512,7 +512,6 @@ Configure fraud rules to protect your transactions.
 const policy = await reevit.fraud.get();
 
 console.log('Current Fraud Policy:', {
-  preferredProviders: policy.prefer,
   maxAmount: policy.max_amount,
   blockedBins: policy.blocked_bins,
   allowedBins: policy.allowed_bins,
@@ -522,14 +521,19 @@ console.log('Current Fraud Policy:', {
 
 ### Update Fraud Policy
 
+Prepared for 0.10.3 (unpublished): pass a stable operation key as the second
+argument. Reuse the same key and payload for that policy revision's retries.
+Standalone fraud policies accept the four fields below. Provider preferences
+belong to payment-intent `policy.prefer`; an older `prefer` property is ignored
+by this update.
+
 ```typescript
 const updatedPolicy = await reevit.fraud.update({
-  prefer: ['paystack', 'flutterwave'],
-  max_amount: 500000,                    // Max 5,000.00
+  max_amount: 500000,                    // Minor-unit threshold
   blocked_bins: ['123456', '654321'],    // Block specific card BINs
   allowed_bins: [],                       // Empty = allow all (except blocked)
   velocity_max_per_minute: 10            // Max 10 transactions per minute
-});
+}, { idempotencyKey: 'fraud-policy:revision_2' });
 
 console.log('Policy updated successfully');
 ```
@@ -538,7 +542,6 @@ console.log('Policy updated successfully');
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `prefer` | `string[]` | Preferred provider order for routing |
 | `max_amount` | `number` | Maximum transaction amount (in smallest unit) |
 | `blocked_bins` | `string[]` | Card BIN prefixes to block |
 | `allowed_bins` | `string[]` | Only allow these BINs (empty = allow all) |

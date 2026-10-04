@@ -19,9 +19,24 @@ try {
   const { Reevit, isReevitAPIError } = createRequire(packagePath)('./');
   let responseBody = { payments: [] };
   const seen = [];
-  const server = http.createServer((request, response) => {
+  const policyWrites = [];
+  const server = http.createServer(async (request, response) => {
     seen.push(request.headers);
     response.setHeader('content-type', 'application/json');
+    if (request.method === 'POST' && request.url === '/v1/policies/fraud') {
+      let body = '';
+      for await (const chunk of request) body += chunk;
+      const payload = JSON.parse(body);
+      policyWrites.push({key: request.headers['idempotency-key'], payload});
+      if (!request.headers['idempotency-key']) {
+        response.writeHead(400);
+        response.end(JSON.stringify({code: 'missing_idempotency_key', message: 'Idempotency-Key header is required'}));
+      } else {
+        response.writeHead(201);
+        response.end(JSON.stringify(payload));
+      }
+      return;
+    }
     response.end(JSON.stringify(responseBody));
   });
   await new Promise((resolve, reject) => {
@@ -36,11 +51,16 @@ try {
     responseBody = { items: [{ id: 'pay_hidden' }] };
     await assert.rejects(client.payments.list(), (error) =>
       isReevitAPIError(error) && error.code === 'unexpected_response_shape');
+    const policy = {max_amount: 5000, blocked_bins: ['400000'], allowed_bins: [], velocity_max_per_minute: 5};
+    const options = {idempotencyKey: 'fraud-policy:packed-revision'};
+    assert.deepEqual(await client.fraud.update({...policy, prefer: ['paystack']}, options), policy);
+    assert.deepEqual(await client.fraud.update(policy, options), policy);
+    assert.deepEqual(policyWrites, [{key: options.idempotencyKey, payload: policy}, {key: options.idempotencyKey, payload: policy}]);
     for (const headers of seen) {
       assert.equal(headers['x-reevit-client-version'], pkg.version);
       assert.equal(headers['user-agent'], `reevit-node/${pkg.version}`);
     }
-    console.log(`Packed ${pkg.name}@${pkg.version}: version headers, list envelopes, and malformed-response errors verified.`);
+    console.log(`Packed ${pkg.name}@${pkg.version}: version headers, list envelopes, malformed-response errors, and keyed fraud policy updates verified.`);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }
