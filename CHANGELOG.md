@@ -2,6 +2,14 @@
 
 All notable changes to `@reevit/node` will be documented in this file.
 
+## [0.10.3] - Unreleased
+
+### Fixed
+
+- Release the existing list-response parser fix: unsupported response shapes raise `unexpected_response_shape` instead of silently returning an empty list.
+- Release the existing version-header fix: `User-Agent` and `X-Reevit-Client-Version` use the package version generated during the build.
+- Verify those behaviors against the packed npm archive with `npm run test:package` before publishing.
+
 ## [0.10.2] - 2026-08-14
 
 ### Fixed

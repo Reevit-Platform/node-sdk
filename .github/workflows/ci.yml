@@ -35,6 +35,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify packed package behavior
+        run: npm run test:package
+
       - name: Run tests
         run: npm test --if-present
 
