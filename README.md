@@ -170,7 +170,7 @@ const payment = await reevit.payments.createIntent({
     product: 'Premium Plan'
   }
 }, {
-  idempotencyKey: 'order_456', // Optional: Safe retries / dedupe
+  idempotencyKey: 'order_456', // Required: reuse for this logical order's retries
 });
 ```
 
