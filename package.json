@@ -1,6 +1,6 @@
 {
   "name": "@reevit/node",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "description": "Reevit Node.js SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,7 +25,8 @@
     "contract:check": "node scripts/check-openapi-contract.mjs",
     "typecheck": "tsc --noEmit",
     "test": "npm run build && node --test",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test:package": "npm run build && node scripts/check-packed-package.mjs"
   },
   "keywords": [
     "reevit",

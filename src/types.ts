@@ -293,7 +293,8 @@ export interface SubscriptionUpdateRequest {
 }
 
 export interface FraudPolicy {
-  prefer: string[];
+  /** @deprecated Provider preferences belong to payment-intent policy, not the standalone fraud policy. */
+  prefer?: string[];
   max_amount: number;
   blocked_bins: string[];
   allowed_bins: string[];
