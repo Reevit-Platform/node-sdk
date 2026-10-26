@@ -1402,9 +1402,10 @@ REEVIT_WEBHOOK_SECRET=whsec_xxx  # Get from Dashboard > Developers > Webhooks
 
 ## Support
 
+- **Website**: [https://reevit.io](https://reevit.io)
 - **Documentation**: [https://docs.reevit.io](https://docs.reevit.io)
-- **API Reference**: [https://api.reevit.io/docs](https://api.reevit.io/docs)
-- **GitHub Issues**: [https://github.com/reevit/reevit-node/issues](https://github.com/reevit/reevit-node/issues)
+- **API Reference**: [https://docs.reevit.io/api-reference](https://docs.reevit.io/api-reference)
+- **GitHub Issues**: [https://github.com/Reevit-Platform/node-sdk/issues](https://github.com/Reevit-Platform/node-sdk/issues)
 - **Email**: support@reevit.io
 
 ## License

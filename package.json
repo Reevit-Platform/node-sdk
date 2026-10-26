@@ -1,7 +1,7 @@
 {
   "name": "@reevit/node",
   "version": "0.10.0",
-  "description": "Reevit Node.js SDK",
+  "description": "Reevit Node.js & TypeScript SDK — Unified payment orchestration for Africa (Paystack, Hubtel, Flutterwave, M-Pesa, Moolre, Monnify, PawaPay, Stripe)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -18,17 +18,29 @@
   },
   "keywords": [
     "reevit",
+    "payment-orchestration",
     "payments",
     "africa",
-    "orchestration"
+    "ghana",
+    "nigeria",
+    "kenya",
+    "mobile-money",
+    "paystack",
+    "hubtel",
+    "flutterwave",
+    "mpesa",
+    "moolre",
+    "monnify",
+    "pawapay",
+    "stripe"
   ],
-  "author": "Reevit",
+  "author": "Reevit <support@reevit.io> (https://reevit.io)",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Reevit-Platform/node-sdk.git"
   },
-  "homepage": "https://github.com/Reevit-Platform/node-sdk#readme",
+  "homepage": "https://reevit.io",
   "bugs": {
     "url": "https://github.com/Reevit-Platform/node-sdk/issues"
   },
