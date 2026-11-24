@@ -2,7 +2,7 @@
 
 All notable changes to `@reevit/node` will be documented in this file.
 
-## [0.10.3] - Unreleased
+## [0.10.3] - 2026-11-24
 
 ### Fixed
 
